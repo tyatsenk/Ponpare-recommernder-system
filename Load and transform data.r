@@ -1,11 +1,11 @@
 #This code reads csv. files downloaded from 
 #https://www.kaggle.com/c/coupon-purchase-prediction/data and performs data type conversion
-
+# This code translate Japanese text into English and performs data types conversion
 
 
 ###Set working directory to the directory which contains scv. files
 
-setwd("/Users/tyatsenk/Documents/Ryerson/Data Analytics/Capstone/data")
+setwd('[enter the path where you downloaded raw data]')
 
 #########################################################
 #Read csv. files and create data frames from it
@@ -28,7 +28,7 @@ prefecture_locations<-read.csv("prefecture_locations.csv", as.is=TRUE)
 #Translate Japaneese text into English
 #########################################################
 
-################### For train  #############################
+################### train  #############################
 
 translation<-data.frame(Japanese=unique(c(train$CAPSULE_TEXT, train$GENRE_NAME, 
                 train$large_area_name, train$ken_name, train$small_area_name)), 
@@ -86,7 +86,7 @@ train<-merge(train, translation, by.x="ken_name", by.y="Japanese", all.x=TRUE)
 names(translation)<-c("Japanese", "small_area_name_en")
 train<-merge(train, translation, by.x="small_area_name", by.y="Japanese", all.x=TRUE)
 
-################### For test #############################
+###################  test #############################
 
 names(translation)<-c("Japanese", "CAPSULE_TEXT_en")
 test<-merge(test, translation, by.x="CAPSULE_TEXT", by.y="Japanese", all.x=TRUE)
@@ -99,7 +99,7 @@ test<-merge(test, translation, by.x="ken_name", by.y="Japanese", all.x=TRUE)
 names(translation)<-c("Japanese", "small_area_name_en")
 test<-merge(test, translation, by.x="small_area_name", by.y="Japanese", all.x=TRUE)
 
-################### For user_list #############################
+###################  user_list #############################
 
 user_list$PREF_NAME[(user_list$PREF_NAME=="")] <- NA #replace empty cells in PREF_NAME for NA
 user_list_jp<-unique(user_list$PREF_NAME)
@@ -129,7 +129,7 @@ user_list<-merge(user_list, translation_user_list, by.x="PREF_NAME", by.y="Japan
 
 
 
-################### For coupon_detail_train #############################
+################### coupon_detail_train #############################
 
 names(translation)<-c("Japanese", "SMALL_AREA_NAME_en")
 coupon_detail_train<-merge(coupon_detail_train, translation, by.x="SMALL_AREA_NAME", 
@@ -137,7 +137,7 @@ coupon_detail_train<-merge(coupon_detail_train, translation, by.x="SMALL_AREA_NA
 
 
 
-################### For coupon_area_test #############################
+###################  coupon_area_test #############################
 
 names(translation)<-c("Japanese", "SMALL_AREA_NAME_en")
 coupon_area_test<-merge(coupon_area_test, translation, by.x="SMALL_AREA_NAME", 
@@ -148,7 +148,7 @@ coupon_area_test<-merge(coupon_area_test, translation, by.x="PREF_NAME",
 
 
 
-################### For coupon_area_train #############################
+###################  coupon_area_train #############################
 
 names(translation)<-c("Japanese", "SMALL_AREA_NAME_en")
 coupon_area_train<-merge(coupon_area_train, translation, by.x="SMALL_AREA_NAME", 
@@ -158,7 +158,7 @@ coupon_area_train<-merge(coupon_area_train, translation, by.x="PREF_NAME",
                          by.y="Japanese", all.x=TRUE)
 
 
-################## For prefecture_locations ############################
+################## prefecture_locations ############################
 
 names(translation)<-c("Japanese", "PREF_NAME_en")
 prefecture_locations<-merge(prefecture_locations, translation, by.x="PREF_NAME", 
@@ -184,3 +184,103 @@ prefecture_locations<-merge(prefecture_locations, translation_prefecture,
 #########################################################
 #Data type conversion
 #########################################################
+
+##################### train #################################
+
+# Split variable DISPFROM (Sales release date) into Date and Time variables
+train$Date_DISPFROM<-substring(train$DISPFROM, 1,11)
+train$Time_DISPFROM<-substring(train$DISPFROM, 11, 19)
+train$Date_DISPFROM<-as.Date(train$Date_DISPFROM)
+train$Time_DISPFROM<-as.factor(train$Time_DISPFROM)
+
+#Split variable DISPEND (Sales end date) into Date and Time variables
+train$Date_DISPEND<-substring(train$DISPEND, 1,11)
+train$Time_DISPEND<-substring(train$DISPEND, 11, 19)
+train$Date_DISPEND<-as.Date(train$Date_DISPEND)
+train$Time_DISPEND<-as.factor(train$Time_DISPEND)
+
+#Convert variable  VALIDFROM (the term of validity starts) into date format
+train$VALIDFROM<-as.Date(train$VALIDFROM)
+
+#Convert variable VALIDEND (the term of validity starts) into date format
+train$VALIDEND<-as.Date(train$VALIDEND)
+
+
+
+##################### test #################################
+
+# Split variable DISPFROM (Sales release date) into Date and Time variables
+test$Date_DISPFROM<-substring(test$DISPFROM, 1,11)
+test$Time_DISPFROM<-substring(test$DISPFROM, 11, 19)
+test$Date_DISPFROM<-as.Date(test$Date_DISPFROM)
+test$Time_DISPFROM<-as.factor(test$Time_DISPFROM)
+
+# Split variable DISPEND (Sales end date) into Date and Time variables
+test$Date_DISPEND<-substring(test$DISPEND, 1,11)
+test$Time_DISPEND<-substring(test$DISPEND, 11, 19)
+test$Date_DISPEND<-as.Date(test$Date_DISPEND)
+test$Time_DISPEND<-as.factor(test$Time_DISPEND)
+
+#Convert variable  VALIDFROM (the term of validity starts) into date format
+test$VALIDFROM<-as.Date(test$VALIDFROM)
+
+#Convert variable VALIDEND (the term of validity starts) into date format
+test$VALIDEND<-as.Date(test$VALIDEND)
+
+
+
+
+######################### coupon_visit_train ###########################
+
+#convert variable I_DATE(coupon view date) into Date and Time:
+coupon_visit_train$Date_I_DATE<-substring(coupon_visit_train$I_DATE, 1,11)
+coupon_visit_train$Time_I_DATE<-substring(coupon_visit_train$I_DATE, 11, 19)
+coupon_visit_train$Date_I_DATE<-strptime(coupon_visit_train$Date_I_DATE, format="%Y-%m-%d")
+coupon_visit_train$Time_I_DATE<-strptime(coupon_visit_train$Time_I_DATE, format="%H:%M:%S")
+
+
+#Create a new variable Weekday, which will show day of the week
+coupon_visit_train$Weekday<-weekdays(coupon_visit_train$Date_I_DATE)
+
+#Create a new variable Hour, which will show hour of the day
+coupon_visit_train$Hour=coupon_visit_train$Time_I_DATE$hour
+
+#convert binary variable PURCHASE_FLG 
+#(0=coupon not purchased, 1=purchased) into factor
+coupon_visit_train$PURCHASE_FLG<-as.factor(coupon_visit_train$PURCHASE_FLG)
+
+######################### user_list  ###########################
+
+
+#convert variable REG_DATE (Registared date) into Date and Time
+user_list$Date_REG_DATE<-substring(user_list$REG_DATE, 1,11)
+user_list$Time_REG_DATE<-substring(user_list$REG_DATE, 11, 19)
+user_list$Date_REG_DATE<-as.Date(user_list$Date_REG_DATE)
+user_list$Time_REG_DATE<-as.factor(user_list$Time_REG_DATE)
+
+# convert variable WITHDRW_DATE (unregistered date) into Date and Time:
+user_list$Date_WITHDRAW_DATE<-substring(user_list$WITHDRAW_DATE, 1,11)
+user_list$Time_WITHDRAW_DATE<-substring(user_list$WITHDRAW_DATE, 11, 19)
+user_list$Date_WITHDRAW_DATE<-as.Date(user_list$Date_WITHDRAW_DATE)
+user_list$Time_WITHDRAW_DATE<-as.factor(user_list$Time_WITHDRAW_DATE)
+
+#convert binary variable SEX_ID (female/male) into factor:
+user_list$SEX_ID<-as.factor(user_list$SEX_ID)
+
+#Create interval groups for AGE:
+user_list$AGE_GROUPS<-cut(user_list$AGE, breaks=c(14,24,34,44,54,64,74,84), 
+                          labels=c("14-23", "24-33","34-43", "44-53", "54-63", 
+                                   "64-73", "74-83"))
+
+
+######################### coupon_detail_train ####################################
+
+# convert variable I_DATE (Purchase date) into Date and Time
+coupon_detail_train$Date_I_DATE<-substring(coupon_detail_train$I_DATE, 1,11)
+coupon_detail_train$Time_I_DATE<-substring(coupon_detail_train$I_DATE, 11, 19)
+coupon_detail_train$Date_I_DATE<-as.Date(coupon_detail_train$Date_I_DATE)
+coupon_detail_train$Time_I_DATE<-as.factor(coupon_detail_train$Time_I_DATE)
+
+#convert variable ITEM_COUNT(Purchased item count) into factor:
+coupon_detail_train$ITEM_COUNT<-as.factor(coupon_detail_train$ITEM_COUNT)
+
